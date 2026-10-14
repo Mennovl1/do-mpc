@@ -319,15 +319,15 @@ class ONNXOperations:
         return x
 
     
-def Constant(self, *args, attribute=None):
-    attrs = {attr.name: attr for attr in (attribute or ())}
-    value_attr = attrs.get("value")
-
-    if value_attr is None:
-        raise NotImplementedError(
-            "Constant currently supports tensor-valued 'value' attributes only."
-        )
-    return numpy_helper.to_array(value_attr.t)
+    def Constant(self, *args, attribute=None):
+        attrs = {attr.name: attr for attr in (attribute or ())}
+        value_attr = attrs.get("value")
+    
+        if value_attr is None:
+            raise NotImplementedError(
+                "Constant currently supports tensor-valued 'value' attributes only."
+            )
+        return numpy_helper.to_array(value_attr.t)
 
 
     def Tanh(self,x, attribute = None):
