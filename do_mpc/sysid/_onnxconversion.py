@@ -324,7 +324,7 @@ class ONNXOperations:
             k.name: k.i if k.type == 2 else k.f for k in attribute
         }
 
-        return numpy_helper.to_array(attr_dict["value"].t)
+        return attr_dict["value"]
 
 
     def Tanh(self,x, attribute = None):
