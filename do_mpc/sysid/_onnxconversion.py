@@ -315,6 +315,18 @@ class ONNXOperations:
     def __init__(self):
         pass
 
+    def Identity(self, x, attribute=None):
+        return x
+
+    def Constant(self, *args, attribute=None):
+        # The constant is passed in the attribute variable under "value".
+        attr_dict = {
+            k.name: k.i if k.type == 2 else k.f for k in attribute
+        }
+
+        return numpy_helper.to_array(attr_dict["value"].t)
+
+
     def Tanh(self,x, attribute = None):
         return casadi.tanh(x)
 
@@ -345,6 +357,30 @@ class ONNXOperations:
 
     def Sub(self, *args, attribute = None):
         return args[0] - args[1]
+
+    def Div(self, *args, attribute=None):
+        return args[0] / args[1]
+
+    def Gather(self, data, indices, attribute=None):
+        """Gather the element at scalar index 0 along the requested axis.
+        See `ONNX documentation <https://github.com/onnx/onnx/blob/main/docs/Operators.md#gather>`_ for more details.
+        """
+        attr_dict = {
+            k.name: k.i if k.type == 2 else k.f for k in attribute
+        }
+
+        index = np.asarray(indices)
+        if index.ndim != 0 or index.item() != 0:
+            raise ValueError("Gather currently supports only a scalar index of 0.")
+
+        axis = next((attr.i for attr in (attribute or ()) if attr.name == "axis"), 0)
+        if isinstance(data, np.ndarray):
+            return np.take(data, 0, axis=axis)
+        if axis == 0:
+            return data[0, :]
+        if axis == 1:
+            return data[:, 0]
+        raise ValueError("Gather axis must be 0 or 1 for CasADi inputs.")
 
     def Gemm(self, *args, attribute = None):
         """General Matrix Multiplication.
@@ -417,7 +453,3 @@ class ONNXOperations:
 
     def Shape(self, *args, attribute = None):
         return args[0].shape
-
-
-    
-
