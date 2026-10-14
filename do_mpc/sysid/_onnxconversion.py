@@ -318,13 +318,16 @@ class ONNXOperations:
     def Identity(self, x, attribute=None):
         return x
 
-    def Constant(self, *args, attribute=None):
-        # The constant is passed in the attribute variable under "value".
-        attr_dict = {
-            k.name: k.i if k.type == 2 else k.f for k in attribute
-        }
+    
+def Constant(self, *args, attribute=None):
+    attrs = {attr.name: attr for attr in (attribute or ())}
+    value_attr = attrs.get("value")
 
-        return attr_dict["value"]
+    if value_attr is None:
+        raise NotImplementedError(
+            "Constant currently supports tensor-valued 'value' attributes only."
+        )
+    return numpy_helper.to_array(value_attr.t)
 
 
     def Tanh(self,x, attribute = None):
